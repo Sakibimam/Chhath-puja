@@ -1,0 +1,180 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-saffron: #ff9933;
+    --color-saffron-dark: #d97706;
+    --color-gold: #fbbf24;
+    --color-teal-dark: #0f2b3c;
+    --color-teal-light: #1e495f;
+  }
+
+  body {
+    background-color: #0b0f19;
+    color: #f8fafc;
+    overflow-x: hidden;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(251, 191, 36, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(251, 191, 36, 0.7);
+}
+
+/* Flame Flicker Animation */
+@keyframes flameFlicker {
+  0%, 100% {
+    transform: scale(1) rotate(-1deg);
+    opacity: 0.95;
+    filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.9)) drop-shadow(0 0 16px rgba(239, 68, 68, 0.8));
+  }
+  25% {
+    transform: scale(1.08) rotate(2deg);
+    opacity: 0.85;
+    filter: drop-shadow(0 0 12px rgba(251, 191, 36, 1)) drop-shadow(0 0 22px rgba(245, 158, 11, 0.9));
+  }
+  50% {
+    transform: scale(0.95) rotate(-2deg);
+    opacity: 1;
+    filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.95)) drop-shadow(0 0 18px rgba(239, 68, 68, 0.85));
+  }
+  75% {
+    transform: scale(1.1) rotate(1deg);
+    opacity: 0.9;
+    filter: drop-shadow(0 0 14px rgba(251, 191, 36, 1)) drop-shadow(0 0 24px rgba(245, 158, 11, 0.95));
+  }
+}
+
+.animate-flame {
+  animation: flameFlicker 1.8s infinite ease-in-out;
+  transform-origin: bottom center;
+}
+
+/* Floating Diya Movement */
+@keyframes diyaBobbing {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1.5deg);
+  }
+}
+
+.animate-diya-bob {
+  animation: diyaBobbing 4s infinite ease-in-out;
+}
+
+/* Water Ripple Effect */
+@keyframes waterRipple {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.animate-ripple {
+  animation: waterRipple 3s infinite cubic-bezier(0, 0.2, 0.8, 1);
+}
+
+/* Sun Pulse Glow */
+@keyframes sunGlow {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+    filter: blur(20px);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.15);
+    filter: blur(35px);
+  }
+}
+
+.animate-sun-glow {
+  animation: sunGlow 8s infinite ease-in-out;
+}
+
+/* Swaying Leaves */
+@keyframes leafSway {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(2.5deg);
+  }
+}
+
+.animate-sway {
+  animation: leafSway 6s infinite ease-in-out;
+  transform-origin: bottom left;
+}
+
+/* Light Motes Floating */
+@keyframes particleFloat {
+  0% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-120px) translateX(30px);
+    opacity: 0;
+  }
+}
+
+.animate-particle {
+  animation: particleFloat 7s infinite ease-out;
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.glass-pill {
+  background: rgba(30, 41, 59, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+/* Golden text gradient */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #fffbeb 0%, #fde047 30%, #f59e0b 70%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-saffron-gradient {
+  background: linear-gradient(135deg, #fef08a 0%, #fb923c 40%, #ea580c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
