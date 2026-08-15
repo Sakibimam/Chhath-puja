@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌅 छठ पूजा (Chhath Puja Geet) — A Nostalgic Audio-Visual Experience
 
-## Getting Started
+> *“दूर देश में बैठे बिहारियों के लिए… घर की याद”*
 
-First, run the development server:
+A single-page web experience built for Biharis living abroad (USA, UK, Canada, and across the diaspora) who miss the sacred morning ghats, the fragrance of *Thekua*, and the timeless folk melodies of **Sharda Sinha** and **Anuradha Paudwal** during Chhath Puja.
 
+---
+
+## ✨ Features
+
+- **🎨 Flat Vector Editorial Artwork**: Designed in a modern paper-cut vector illustration style (inspired by New Yorker covers & editorial art) with warm terracotta tones, a glowing sun horizon, and generous negative sky space.
+- **🎵 12 Programmatically Verified Chhath Classics**: Hardcoded tracklist featuring iconic songs by Sharda Sinha, Anuradha Paudwal, Kalpana Patowary, and Pawan Singh. Every video ID is programmatically verified against YouTube's official `oEmbed` API to guarantee **HTTP 200 OK** embeddability.
+- **📻 Official Spotify Embed Widget**: Includes a dedicated playlist drawer featuring Spotify's sanctioned 50-track *"Chhath Puja Geet"* playlist (21.9K+ saves) as a secondary listening option.
+- **🪔 Interactive Floating River Diyas**: Click or tap anywhere on the Ganges river water to float a glowing diya downstream accompanied by golden spark confetti bursts.
+- **📱 100% Mobile Responsive Glassmorphic Player**: Ultra-minimalist bottom player capsule with real-time time progress polling (250ms), seek control, and touch-optimized controls for mobile devices.
+
+---
+
+## 🎶 Playlist Tracklist (12 Verified Classics)
+
+1. **केलवा के पात पर** — *Sharda Sinha*
+2. **उगा हो सूरज देव** — *Anuradha Paudwal*
+3. **काँच ही बाँस के बहँगिया** — *Anuradha Paudwal*
+4. **हो दीनानाथ** — *Sharda Sinha*
+5. **पहिल पहिल छठी मईया** — *Sharda Sinha*
+6. **मारबो रे सुगवा धनुष से** — *Anuradha Paudwal*
+7. **बहंगी लचकत जाये** — *Kalpana Patowary*
+8. **छठी माई के घाटवा पे** — *Pawan Singh*
+9. **पटना के घाट पर** — *Sharda Sinha*
+10. **आठ ही बाँस के बहँगिया** — *Traditional / Devi*
+11. **अरघ के बेर भइले** — *Anuradha Paudwal*
+12. **दुखवा मिटाईं छठी मईया** — *Sharda Sinha*
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 16 App Router](https://nextjs.org/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Motion & Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **Audio Control**: [`react-youtube`](https://github.com/tjallingt/react-youtube) (Official YouTube IFrame Player API)
+- **Effects**: `canvas-confetti` & `lucide-react`
+
+---
+
+## 🚀 Quick Start
+
+### 1. Clone the repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/Sakibimam/Chhath-puja.git
+cd Chhath-puja
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install dependencies
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Run locally
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser to experience the site.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. Build for production
+```bash
+npm run build
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 📡 Programmatic YouTube ID Verification
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+To check or add new song IDs against YouTube's oEmbed endpoint without hallucinating video IDs:
+```bash
+node scripts/verify-youtube-ids.js
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 📄 License
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Created with devotion for the Bihari diaspora worldwide. 🙏
