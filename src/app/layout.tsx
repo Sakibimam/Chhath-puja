@@ -13,7 +13,15 @@ const outfit = Outfit({
   variable: "--font-outfit",
 });
 
+// Construct base URL for Vercel CDN or local development
+const baseUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}`
+  : "http://localhost:3000";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(baseUrl),
   title: "छठ पूजा | Chhathi Maiya Ke Geet — Ghat Par Khade Hokar Suno",
   description: "Immersive nostalgic Chhath Puja experience with 12 classic folk songs by Anuradha Paudwal, Sharda Sinha & Pawan Singh. Feel the devotion, river ghat mist, floating diyas and rising sun.",
   keywords: [
@@ -28,13 +36,18 @@ export const metadata: Metadata = {
     "Chhath Diaspora"
   ],
   icons: {
-    icon: "/icon.png",
-    shortcut: "/icon.png",
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icon.png", type: "image/png" }
+    ],
+    shortcut: "/favicon.ico",
     apple: "/icon.png",
   },
   openGraph: {
     title: "छठ पूजा | Chhathi Maiya Ke Geet",
     description: "Immersive Bihar Chhath Ghat experience with golden sun, floating diyas and classic Chhath geet.",
+    url: baseUrl,
+    siteName: "छठ पूजा गीत",
     type: "website",
     images: [
       {
