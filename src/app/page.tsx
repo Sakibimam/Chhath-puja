@@ -38,7 +38,7 @@ export default function Home() {
   };
 
   return (
-    <main className="relative w-full h-screen overflow-hidden bg-slate-950 text-slate-100 font-sans">
+    <main className="relative w-full h-dvh overflow-hidden bg-slate-950 text-slate-100 font-sans">
       {/* 1. Interactive Animated Bihar River Ghat Background */}
       <BackgroundScene />
 
@@ -46,7 +46,7 @@ export default function Home() {
       <TopBar />
 
       {/* 3. Center Painted Hindi Title (Deluxe Saloon / 9XM Style) */}
-      <CenterTitle onOpenPlaylistModal={() => setIsPlaylistOpen(true)} />
+      <CenterTitle />
 
       {/* 4. Bottom Floating Glass Pill Music Player */}
       <MusicPlayer

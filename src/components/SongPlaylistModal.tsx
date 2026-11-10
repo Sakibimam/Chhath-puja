@@ -30,7 +30,7 @@ export default function SongPlaylistModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-[#0f0a07]/80 backdrop-blur-md">
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6 bg-[#0f0a07]/80 backdrop-blur-md">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -40,14 +40,14 @@ export default function SongPlaylistModal({
         />
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.94, y: 25 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.94, y: 25 }}
+          initial={{ opacity: 0, y: 60 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 60 }}
           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full max-w-2xl max-h-[85vh] flex flex-col bg-gradient-to-b from-[#241710] via-[#170e0a] to-[#0f0a07] border border-[#5c3a28]/40 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.9)] overflow-hidden z-10"
+          className="relative w-full max-w-2xl max-h-[90dvh] sm:max-h-[85dvh] flex flex-col bg-gradient-to-b from-[#241710] via-[#170e0a] to-[#0f0a07] border border-[#5c3a28]/40 rounded-t-3xl sm:rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.9)] overflow-hidden z-10"
         >
           {/* Header */}
-          <div className="p-5 sm:p-6 border-b border-[#5c3a28]/25 flex items-center justify-between bg-[#1f140e]/90 backdrop-blur-md">
+          <div className="px-4 py-4 sm:p-6 border-b border-[#5c3a28]/25 flex items-center justify-between bg-[#1f140e]/90 backdrop-blur-md">
             <div className="flex items-center gap-3.5">
               <div className="w-10 h-10 rounded-2xl bg-[#3a2418] border border-[#5c3a28]/40 flex items-center justify-center text-amber-100 shadow-md">
                 <Music className="w-5 h-5 stroke-[2.5]" />
@@ -71,13 +71,13 @@ export default function SongPlaylistModal({
           </div>
 
           {/* Playlist source label */}
-          <div className="flex items-center gap-2 px-6 py-3 border-b border-[#5c3a28]/20 bg-[#170e0a] text-xs sm:text-sm font-bold text-amber-200">
+          <div className="flex items-center gap-2 px-4 sm:px-6 py-3 border-b border-[#5c3a28]/20 bg-[#170e0a] text-xs sm:text-sm font-bold text-amber-200">
             <Music className="w-3.5 h-3.5" />
             <span>Top Chhath Puja Hits ({CHHATH_SONGS.length})</span>
           </div>
 
           {/* Modal Content */}
-          <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto overscroll-contain p-3 sm:p-6 custom-scrollbar">
               <div className="space-y-2.5">
                 {CHHATH_SONGS.map((song, index) => {
                   const isCurrent = song.id === currentSong.id;
@@ -87,7 +87,7 @@ export default function SongPlaylistModal({
                     <motion.div
                       key={song.id}
                       whileHover={{ scale: 1.01, x: 4 }}
-                      className={`group relative p-3.5 sm:p-4 rounded-2xl transition-all flex items-center justify-between border cursor-pointer ${
+                      className={`group relative p-3 sm:p-4 rounded-2xl transition-all flex items-center justify-between border cursor-pointer ${
                         isCurrent
                           ? "bg-gradient-to-r from-[#3a2418]/90 via-[#281810]/90 to-[#3a2418]/80 border-amber-400/60 shadow-xl"
                           : "bg-[#170e0a]/60 hover:bg-[#241710]/80 border-[#5c3a28]/15 hover:border-[#5c3a28]/40"
@@ -97,8 +97,8 @@ export default function SongPlaylistModal({
                         onClose();
                       }}
                     >
-                      <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                        <div className="relative w-10 h-10 rounded-full bg-[#140c08] border border-[#5c3a28]/40 flex items-center justify-center shrink-0 shadow-md">
+                      <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 flex-1">
+                        <div className="relative w-10 h-10 hidden sm:flex rounded-full bg-[#140c08] border border-[#5c3a28]/40 items-center justify-center shrink-0 shadow-md">
                           {isCurrent && isPlaying ? (
                             <Disc className="w-5 h-5 text-amber-400 animate-spin-slow" />
                           ) : (
@@ -153,7 +153,7 @@ export default function SongPlaylistModal({
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="p-2 rounded-full bg-red-950/80 hover:bg-red-900 text-red-400 border border-red-500/30 transition-all hover:scale-105 active:scale-95"
+                          className="p-2.5 rounded-full bg-red-950/80 hover:bg-red-900 text-red-400 border border-red-500/30 transition-all hover:scale-105 active:scale-95"
                           title="YouTube पर देखें"
                         >
                           <YoutubeIcon className="w-4 h-4" />
@@ -166,7 +166,7 @@ export default function SongPlaylistModal({
           </div>
 
           {/* Footer */}
-          <div className="p-4 sm:p-5 bg-[#0f0a07] border-t border-[#5c3a28]/25 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-5 bg-[#0f0a07] border-t border-[#5c3a28]/25 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-xs text-amber-200/80">
               <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
               <span>छठी मईया का आशीर्वाद सदा आप पर बना रहे 🙏</span>
@@ -177,7 +177,7 @@ export default function SongPlaylistModal({
                 href={YT_PLAYLIST_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-red-950/90 hover:bg-red-900 text-white font-bold text-xs border border-red-500/40 transition-colors shadow-lg active:scale-95"
+                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-red-950/90 hover:bg-red-900 text-white font-bold text-xs border border-red-500/40 transition-colors shadow-lg active:scale-95"
               >
                 <YoutubeIcon className="w-3.5 h-3.5" />
                 <span>Open Playlist</span>

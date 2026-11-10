@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
@@ -24,6 +24,29 @@ interface Particle {
   delay: number;
 }
 
+// Seeded PRNG so the light motes are identical on the server and in the browser
+// (no hydration mismatch, no setState-in-effect).
+function seededRandom(seed: number) {
+  return () => {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const rand = seededRandom(1990);
+const PARTICLES: Particle[] = Array.from({ length: 36 }).map((_, i) => ({
+  id: i,
+  x: rand() * 100,
+  y: 20 + rand() * 75,
+  size: rand() * 4 + 2,
+  duration: rand() * 7 + 7,
+  delay: rand() * 5,
+}));
+// Phones render only the first few motes (GPU-heavy blur/shadow animations).
+const MOBILE_PARTICLE_COUNT = 14;
+
 export default function BackgroundScene() {
   const [diyas, setDiyas] = useState<FloatingDiya[]>([
     { id: 1, x: 12, y: 78, scale: 1.1, duration: 4.8, driftRange: 25, delay: 0 },
@@ -36,19 +59,6 @@ export default function BackgroundScene() {
     { id: 8, x: 88, y: 81, scale: 1.15, duration: 4.0, driftRange: 32, delay: 0.9 },
   ]);
 
-  const [particles, setParticles] = useState<Particle[]>([]);
-
-  useEffect(() => {
-    const generatedParticles: Particle[] = Array.from({ length: 36 }).map((_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: 20 + Math.random() * 75,
-      size: Math.random() * 4 + 2,
-      duration: Math.random() * 7 + 7,
-      delay: Math.random() * 5,
-    }));
-    setParticles(generatedParticles);
-  }, []);
 
   const handleWaterClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -82,7 +92,7 @@ export default function BackgroundScene() {
 
   return (
     <div
-      className="absolute inset-0 w-full h-screen overflow-hidden select-none bg-slate-950 cursor-pointer pointer-events-auto z-0"
+      className="absolute inset-0 w-full h-full overflow-hidden select-none bg-slate-950 cursor-pointer pointer-events-auto z-0"
       onClick={handleWaterClick}
     >
       {/* 1. Base Flat Illustrated Background Art (Full Original Warm Gold/Cream Saturation) */}
@@ -104,6 +114,7 @@ export default function BackgroundScene() {
           fill
           priority
           quality={95}
+          sizes="100vw"
           className="object-cover object-center transform filter brightness-[1.0] contrast-[1.0]"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-60" />
@@ -133,7 +144,7 @@ export default function BackgroundScene() {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="w-[300px] h-[300px] rounded-full bg-gradient-to-tr from-amber-500/30 via-orange-400/20 to-yellow-200/10 blur-3xl"
+          className="w-[220px] h-[220px] sm:w-[300px] sm:h-[300px] rounded-full bg-gradient-to-tr from-amber-500/30 via-orange-400/20 to-yellow-200/10 blur-3xl"
         />
       </div>
 
@@ -197,8 +208,9 @@ export default function BackgroundScene() {
       </div>
 
       {/* 5. Light Motes */}
-      <div className="absolute inset-0 pointer-events-none z-15 overflow-hidden">
-        {particles.map((p) => (
+      {/* Hidden entirely for users who ask their OS for reduced motion */}
+      <div className="absolute inset-0 pointer-events-none z-15 overflow-hidden motion-reduce:hidden">
+        {PARTICLES.map((p) => (
           <motion.div
             key={p.id}
             initial={{ opacity: 0, y: 0 }}
@@ -219,7 +231,9 @@ export default function BackgroundScene() {
               width: `${p.size}px`,
               height: `${p.size}px`,
             }}
-            className="absolute rounded-full bg-gradient-to-t from-amber-300 to-yellow-100 shadow-[0_0_8px_#fde047]"
+            className={`absolute rounded-full bg-gradient-to-t from-amber-300 to-yellow-100 shadow-[0_0_8px_#fde047] ${
+              p.id >= MOBILE_PARTICLE_COUNT ? "hidden sm:block" : ""
+            }`}
           />
         ))}
       </div>

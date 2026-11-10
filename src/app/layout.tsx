@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Rozha_One, Outfit } from "next/font/google";
 import "./globals.css";
 
@@ -23,7 +23,7 @@ const baseUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: "छठ पूजा | Chhathi Maiya Ke Geet — Ghat Par Khade Hokar Suno",
-  description: "Immersive nostalgic Chhath Puja experience with 12 classic folk songs by Anuradha Paudwal, Sharda Sinha & Pawan Singh. Feel the devotion, river ghat mist, floating diyas and rising sun.",
+  description: "Immersive nostalgic Chhath Puja experience with 25 classic folk songs by Anuradha Paudwal, Sharda Sinha & Pawan Singh. Feel the devotion, river ghat mist, floating diyas and rising sun.",
   keywords: [
     "Chhath Puja",
     "Chhathi Maiya",
@@ -64,6 +64,13 @@ export const metadata: Metadata = {
     description: "Immersive Bihar Chhath Ghat experience with golden sun, floating diyas and classic Chhath geet.",
     images: ["/og-image.jpg"],
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover", // lets us pad around the notch / home indicator
+  themeColor: "#f7eedc",
 };
 
 export default function RootLayout({

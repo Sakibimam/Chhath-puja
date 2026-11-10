@@ -11,6 +11,7 @@ import {
   Disc,
   X,
   AlertCircle,
+  ListMusic,
 } from "lucide-react";
 import { Song, CHHATH_SONGS } from "@/data/songs";
 
@@ -34,11 +35,18 @@ export default function MusicPlayer({
   onSongEnd,
 }: MusicPlayerProps) {
   const playerRef = useRef<YouTubePlayer | null>(null);
-  const [currentTime, setCurrentTime] = useState<number>(0);
+  // Progress is stored with the song it belongs to, so switching songs shows 0:00
+  // immediately without resetting state inside an effect.
+  const [progress, setProgress] = useState<{ songId: string; time: number }>({
+    songId: currentSong.youtubeId,
+    time: 0,
+  });
+  const currentTime = progress.songId === currentSong.youtubeId ? progress.time : 0;
   const [duration, setDuration] = useState<number>(425);
   const [isPlayerReady, setIsPlayerReady] = useState<boolean>(false);
   const [showVideoModal, setShowVideoModal] = useState<boolean>(false);
-  const [skipCount, setSkipCount] = useState<number>(0);
+  const skipCountRef = useRef<number>(0);
+  const isPlayingRef = useRef<boolean>(isPlaying);
   const [hasNoPlayableTracks, setHasNoPlayableTracks] = useState<boolean>(false);
 
   const opts: YouTubeProps["opts"] = {
@@ -64,12 +72,12 @@ export default function MusicPlayer({
       if (isPlaying) {
         event.target.playVideo();
       }
-    } catch (e) {}
+    } catch {}
   };
 
   const onStateChange = (event: { data: number }) => {
     if (event.data === 1) { // PLAYING
-      setSkipCount(0);
+      skipCountRef.current = 0;
       setHasNoPlayableTracks(false);
       if (!isPlaying) onPlayToggle();
     } else if (event.data === 2) { // PAUSED
@@ -84,18 +92,15 @@ export default function MusicPlayer({
       `[YouTube Error ${event.data}] Track "${currentSong.title}" (ID: ${currentSong.youtubeId}) failed to embed.`
     );
 
-    setSkipCount((prev) => {
-      const nextCount = prev + 1;
-      if (nextCount >= CHHATH_SONGS.length) {
-        console.warn("⚠️ Reached max skip limit (all tracks failed to embed). Stopping auto-skip.");
-        setHasNoPlayableTracks(true);
-        return nextCount;
-      }
-      setTimeout(() => {
-        onNextSong();
-      }, 700);
-      return nextCount;
-    });
+    skipCountRef.current += 1;
+    if (skipCountRef.current >= CHHATH_SONGS.length) {
+      console.warn("⚠️ Reached max skip limit (all tracks failed to embed). Stopping auto-skip.");
+      setHasNoPlayableTracks(true);
+      return;
+    }
+    setTimeout(() => {
+      onNextSong();
+    }, 700);
   };
 
   const handlePlayClick = () => {
@@ -106,20 +111,25 @@ export default function MusicPlayer({
         } else {
           playerRef.current.pauseVideo();
         }
-      } catch (err) {}
+      } catch {}
     }
     onPlayToggle();
   };
 
+  // Keep the latest play state readable from the song-change effect below
+  // without re-loading the video every time play/pause is toggled.
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
+
   useEffect(() => {
     if (!playerRef.current || !isPlayerReady) return;
     try {
-      setCurrentTime(0);
       playerRef.current.loadVideoById(currentSong.youtubeId);
-      if (isPlaying) {
+      if (isPlayingRef.current) {
         playerRef.current.playVideo();
       }
-    } catch (e) {}
+    } catch {}
   }, [currentSong.youtubeId, isPlayerReady]);
 
   useEffect(() => {
@@ -130,34 +140,35 @@ export default function MusicPlayer({
       } else {
         playerRef.current.pauseVideo();
       }
-    } catch (e) {}
+    } catch {}
   }, [isPlaying, isPlayerReady]);
 
   // Real-time progress polling (250ms interval)
   useEffect(() => {
     let interval: NodeJS.Timeout;
+    const songId = currentSong.youtubeId;
     if (isPlaying && isPlayerReady && playerRef.current) {
       interval = setInterval(async () => {
         try {
           if (playerRef.current?.getCurrentTime) {
             const cur = await playerRef.current.getCurrentTime();
             const dur = await playerRef.current.getDuration();
-            if (cur !== undefined && cur !== null) setCurrentTime(cur);
+            if (cur !== undefined && cur !== null) setProgress({ songId, time: cur });
             if (dur && dur > 0) setDuration(dur);
           }
-        } catch (e) {}
+        } catch {}
       }, 250);
     }
     return () => clearInterval(interval);
-  }, [isPlaying, isPlayerReady]);
+  }, [isPlaying, isPlayerReady, currentSong.youtubeId]);
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const seekTime = parseFloat(e.target.value);
-    setCurrentTime(seekTime);
+    setProgress({ songId: currentSong.youtubeId, time: seekTime });
     if (playerRef.current && isPlayerReady) {
       try {
         playerRef.current.seekTo(seekTime, true);
-      } catch (e) {}
+      } catch {}
     }
   };
 
@@ -169,7 +180,7 @@ export default function MusicPlayer({
   };
 
   return (
-    <div className="fixed bottom-4 sm:bottom-8 inset-x-0 z-40 px-3 sm:px-4 flex flex-col items-center gap-2 sm:gap-3">
+    <div className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] sm:bottom-8 inset-x-0 z-40 px-3 sm:px-4 flex flex-col items-center gap-2 sm:gap-3">
       {/* Notice Banner if all tracks fail to play */}
       <AnimatePresence>
         {hasNoPlayableTracks && (
@@ -189,7 +200,7 @@ export default function MusicPlayer({
       <div
         className={`relative rounded-2xl overflow-hidden shadow-2xl border border-stone-700/40 bg-stone-950/90 backdrop-blur-xl transition-all duration-300 ${
           showVideoModal
-            ? "w-[92vw] max-w-lg h-56 sm:h-72 mb-2 z-50 opacity-100 pointer-events-auto"
+            ? "w-[92vw] max-w-lg aspect-video mb-2 z-50 opacity-100 pointer-events-auto"
             : "w-[320px] h-[180px] fixed -bottom-[500px] -right-[500px] opacity-0 pointer-events-none -z-50"
         }`}
       >
@@ -206,10 +217,10 @@ export default function MusicPlayer({
         {showVideoModal && (
           <button
             onClick={() => setShowVideoModal(false)}
-            className="absolute top-2 right-2 p-1.5 rounded-full bg-stone-950/80 text-stone-300 border border-stone-700/30 backdrop-blur-md shadow-md z-10 hover:scale-105 active:scale-95"
+            className="absolute top-2 right-2 p-2.5 rounded-full bg-stone-950/80 text-stone-300 border border-stone-700/30 backdrop-blur-md shadow-md z-10 hover:scale-105 active:scale-95"
             title="Minimize Video"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="w-4 h-4" />
           </button>
         )}
       </div>
@@ -219,7 +230,7 @@ export default function MusicPlayer({
         initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-        className="w-[calc(100%-1rem)] max-w-md sm:max-w-lg rounded-full bg-white/40 backdrop-blur-2xl border border-white/50 p-2 sm:p-2.5 shadow-2xl shadow-stone-950/30 flex items-center justify-between gap-2 sm:gap-3"
+        className="w-full max-w-md sm:max-w-lg rounded-full bg-white/40 backdrop-blur-2xl border border-white/50 p-2 sm:p-2.5 shadow-2xl shadow-stone-950/30 flex items-center justify-between gap-2 sm:gap-3"
       >
         <div
           onClick={() => setShowVideoModal((prev) => !prev)}
@@ -253,18 +264,24 @@ export default function MusicPlayer({
             </AnimatePresence>
 
             <div className="flex items-center gap-1.5 sm:gap-2 mt-0.5">
-              <span className="text-[9px] sm:text-[10px] font-mono text-[#3a2418] font-bold shrink-0">
+              <span className="text-[10px] sm:text-[11px] font-mono text-[#3a2418] font-bold shrink-0">
                 {formatTime(currentTime)} / {formatTime(duration)}
               </span>
 
-              <div className="relative flex-1 flex items-center min-w-[50px]">
+              {/* Tall invisible hit area so the seek bar is easy to drag with a finger */}
+              <div
+                className="relative flex-1 flex items-center min-w-[50px] h-6"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1 bg-[#3a2418]/25 rounded-lg pointer-events-none" />
                 <input
                   type="range"
                   min={0}
                   max={duration || 100}
                   value={currentTime}
                   onChange={handleSeek}
-                  className="w-full h-1 bg-[#3a2418]/25 rounded-lg appearance-none cursor-pointer accent-[#3a2418] focus:outline-none"
+                  aria-label="Seek"
+                  className="relative z-10 w-full h-6 bg-transparent appearance-none cursor-pointer accent-[#3a2418] focus:outline-none touch-none"
                 />
                 <div
                   className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-[#3a2418] rounded-lg pointer-events-none"
@@ -275,34 +292,46 @@ export default function MusicPlayer({
           </div>
         </div>
 
-        {/* Mobile Friendly Touch Controls */}
-        <div className="flex items-center gap-0.5 sm:gap-1.5 shrink-0">
+        {/* Touch controls: every target is at least 36px */}
+        <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
           <button
             onClick={onPrevSong}
-            className="p-1.5 sm:p-2 rounded-full hover:bg-[#3a2418]/15 text-[#3a2418] font-bold transition-colors active:scale-95 touch-manipulation"
+            className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-[#3a2418]/15 text-[#3a2418] transition-colors active:scale-95 touch-manipulation"
             title="Prev"
+            aria-label="Previous song"
           >
-            <SkipBack className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
+            <SkipBack className="w-4 h-4 stroke-[2.5]" />
           </button>
 
           <button
             onClick={handlePlayClick}
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#3a2418] hover:bg-[#281810] text-amber-100 flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-all border border-[#5c3a28]/40 touch-manipulation"
+            className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#3a2418] hover:bg-[#281810] text-amber-100 flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-all border border-[#5c3a28]/40 touch-manipulation"
             title={isPlaying ? "Pause" : "Play"}
+            aria-label={isPlaying ? "Pause" : "Play"}
           >
             {isPlaying ? (
-              <Pause className="w-3.5 h-3.5 fill-current" />
+              <Pause className="w-4 h-4 fill-current" />
             ) : (
-              <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
+              <Play className="w-4 h-4 fill-current ml-0.5" />
             )}
           </button>
 
           <button
             onClick={onNextSong}
-            className="p-1.5 sm:p-2 rounded-full hover:bg-[#3a2418]/15 text-[#3a2418] font-bold transition-colors active:scale-95 touch-manipulation"
+            className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-[#3a2418]/15 text-[#3a2418] transition-colors active:scale-95 touch-manipulation"
             title="Next"
+            aria-label="Next song"
           >
-            <SkipForward className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
+            <SkipForward className="w-4 h-4 stroke-[2.5]" />
+          </button>
+
+          <button
+            onClick={onOpenPlaylistModal}
+            className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-[#3a2418]/15 text-[#3a2418] transition-colors active:scale-95 touch-manipulation"
+            title="Playlist"
+            aria-label="Open playlist"
+          >
+            <ListMusic className="w-4 h-4 stroke-[2.5]" />
           </button>
         </div>
       </motion.div>
