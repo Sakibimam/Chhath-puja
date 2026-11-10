@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Play, Music, ExternalLink, Disc, Radio, Sparkles } from "lucide-react";
-import { Song, CHHATH_SONGS, SPOTIFY_PLAYLIST_URL, YT_MUSIC_PLAYLIST_URL } from "@/data/songs";
+import { X, Play, Music, ExternalLink, Disc, Sparkles } from "lucide-react";
+import { Song, CHHATH_SONGS, YT_PLAYLIST_URL } from "@/data/songs";
 
 const YoutubeIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor">
@@ -26,8 +26,6 @@ export default function SongPlaylistModal({
   isPlaying,
   onSelectSong,
 }: SongPlaylistModalProps) {
-  const [activeTab, setActiveTab] = useState<"highlights" | "spotify">("highlights");
-
   if (!isOpen) return null;
 
   return (
@@ -72,36 +70,14 @@ export default function SongPlaylistModal({
             </button>
           </div>
 
-          {/* Secondary Listening Option Tab Bar */}
-          <div className="flex items-center gap-2 px-6 pt-4 border-b border-[#5c3a28]/20 bg-[#170e0a]">
-            <button
-              onClick={() => setActiveTab("highlights")}
-              className={`pb-3 px-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 transition-all ${
-                activeTab === "highlights"
-                  ? "border-amber-400 text-amber-200"
-                  : "border-transparent text-amber-200/50 hover:text-amber-200/80"
-              }`}
-            >
-              <Music className="w-3.5 h-3.5" />
-              <span>YouTube Highlights (12)</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("spotify")}
-              className={`pb-3 px-3 text-xs sm:text-sm font-bold flex items-center gap-2 border-b-2 transition-all ${
-                activeTab === "spotify"
-                  ? "border-emerald-400 text-emerald-300"
-                  : "border-transparent text-amber-200/50 hover:text-emerald-300/80"
-              }`}
-            >
-              <Radio className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Spotify Official (50 Tracks)</span>
-            </button>
+          {/* Playlist source label */}
+          <div className="flex items-center gap-2 px-6 py-3 border-b border-[#5c3a28]/20 bg-[#170e0a] text-xs sm:text-sm font-bold text-amber-200">
+            <Music className="w-3.5 h-3.5" />
+            <span>Top Chhath Puja Hits ({CHHATH_SONGS.length})</span>
           </div>
 
           {/* Modal Content */}
           <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar">
-            {activeTab === "highlights" ? (
               <div className="space-y-2.5">
                 {CHHATH_SONGS.map((song, index) => {
                   const isCurrent = song.id === currentSong.id;
@@ -187,21 +163,6 @@ export default function SongPlaylistModal({
                   );
                 })}
               </div>
-            ) : (
-              /* Spotify Official Sanctioned Embed Container */
-              <div className="rounded-2xl border border-[#5c3a28]/40 p-2.5 bg-[#140c08]/80 shadow-2xl overflow-hidden">
-                <iframe
-                  src="https://open.spotify.com/embed/playlist/37i9dQZF1DX8AYACgIFhwm?utm_source=generator"
-                  width="100%"
-                  height="352"
-                  frameBorder="0"
-                  allowFullScreen
-                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                  loading="lazy"
-                  className="rounded-xl w-full"
-                />
-              </div>
-            )}
           </div>
 
           {/* Footer */}
@@ -213,25 +174,16 @@ export default function SongPlaylistModal({
 
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <a
-                href={YT_MUSIC_PLAYLIST_URL}
+                href={YT_PLAYLIST_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-red-950/90 hover:bg-red-900 text-white font-bold text-xs border border-red-500/40 transition-colors shadow-lg active:scale-95"
               >
                 <YoutubeIcon className="w-3.5 h-3.5" />
-                <span>YT Music</span>
+                <span>Open Playlist</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
 
-              <a
-                href={SPOTIFY_PLAYLIST_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-emerald-950/90 hover:bg-emerald-900 text-emerald-200 font-bold text-xs border border-emerald-500/40 transition-colors shadow-lg active:scale-95"
-              >
-                <span>Spotify App</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
             </div>
           </div>
         </motion.div>

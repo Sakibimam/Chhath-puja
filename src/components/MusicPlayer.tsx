@@ -44,6 +44,9 @@ export default function MusicPlayer({
   const opts: YouTubeProps["opts"] = {
     height: "100%",
     width: "100%",
+    // Privacy-enhanced mode: no tracking cookies, so any ads YouTube serves
+    // are non-personalized. (YouTube still controls whether ads run.)
+    host: "https://www.youtube-nocookie.com",
     playerVars: {
       autoplay: 1,
       controls: 1,
