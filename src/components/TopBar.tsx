@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import LiveListeners from "@/components/LiveListeners";
 
 export default function TopBar() {
   const [timeStr, setTimeStr] = useState<string>("");
@@ -34,6 +35,9 @@ export default function TopBar() {
       <div className="pointer-events-auto flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 border border-[#3a2418]/15 backdrop-blur-md text-[#3a2418] font-mono text-xs shadow-sm font-bold">
         <span>{timeStr || "4:50 pm"}</span>
       </div>
+
+      {/* Top-Right: Real-time count of people on the site */}
+      <LiveListeners />
     </motion.header>
   );
 }
